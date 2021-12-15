@@ -40,14 +40,18 @@ public final class JavaShellLauncher {
             // .option("java.JavaHome", javaHome) //
             // .options(contextOptions) //
             .allowAllAccess(true) //
+            .option("java.Classpath", "src:/home/borkdude/.m2/repository/org/clojure/clojure/1.10.1/clojure-1.10.1.jar:/home/borkdude/.m2/repository/org/clojure/core.specs.alpha/0.2.44/core.specs.alpha-0.2.44.jar:/home/borkdude/.m2/repository/org/clojure/spec.alpha/0.2.176/spec.alpha-0.2.176.jar")
             .build();
-        Value system = espresso.getBindings("java").getMember("java.lang.System");
-        Value userDir = system.invokeMember("getProperty", "user.dir");
-        System.out.println(userDir.asString());
     }
     public static void main(String[] args) {
         try {
-            System.out.println(espresso.eval("java", "1 + 1"));
+            Value system = espresso.getBindings("java").getMember("java.lang.System");
+            Value userDir = system.invokeMember("getProperty", "user.dir");
+            System.out.println(userDir.asString());
+            Value clojure = espresso.getBindings("java").getMember("clojure.java.api.Clojure");
+            Value loadString = clojure.invokeMember("var", "clojure.core/load-string");
+            Value res = loadString.invokeMember("invoke", "(str (+ 1 2 3))");
+            System.out.println(res.asString());
         } catch (Exception e) {
             e.printStackTrace();
         }
