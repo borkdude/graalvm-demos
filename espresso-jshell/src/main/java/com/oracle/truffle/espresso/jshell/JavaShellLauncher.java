@@ -28,13 +28,26 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import jdk.jshell.tool.JavaShellToolBuilder;
+import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.Context;
 
 public final class JavaShellLauncher {
 
+    private static Context espresso;
+
+    static {
+        espresso = Context.newBuilder("java") //
+            // .option("java.JavaHome", javaHome) //
+            // .options(contextOptions) //
+            .allowAllAccess(true) //
+            .build();
+        Value system = espresso.getBindings("java").getMember("java.lang.System");
+        Value userDir = system.invokeMember("getProperty", "user.dir");
+        System.out.println(userDir.asString());
+    }
     public static void main(String[] args) {
         try {
-            EspressoLocalExecutionControl.initializeInParallel(extractRemoteOptions(args));
-            System.exit(JavaShellToolBuilder.builder().start(withEspressoExecutionEngine(args)));
+            System.out.println(espresso.eval("java", "1 + 1"));
         } catch (Exception e) {
             e.printStackTrace();
         }
